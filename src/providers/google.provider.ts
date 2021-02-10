@@ -1,9 +1,9 @@
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 import 'firebase/auth';
-import {GoogleSignInResult, SignInOptions} from '../definitions';
+import { GoogleSignInResult, SignInOptions } from '../definitions';
 import OAuthCredential = firebase.auth.OAuthCredential;
 
-export const googleSignInWeb: (options: {providerId: string, data?: SignInOptions}) => Promise<GoogleSignInResult>
+export const googleSignInWeb: (options: { providerId: string, data?: SignInOptions }) => Promise<GoogleSignInResult>
     = async () => {
         try {
 
@@ -12,7 +12,7 @@ export const googleSignInWeb: (options: {providerId: string, data?: SignInOption
 
             const userCredential = await firebase.auth().signInWithPopup(provider);
 
-            const {credential}: { credential: OAuthCredential } = userCredential;
+            const { credential }: { credential: OAuthCredential } = userCredential;
             return new GoogleSignInResult(credential.idToken);
 
         } catch (e) {

@@ -1,22 +1,22 @@
-import {Capacitor, Plugins, registerWebPlugin} from '@capacitor/core';
-import * as firebase from 'firebase/app';
+import { Capacitor, Plugins, registerWebPlugin } from '@capacitor/core';
+import firebase from 'firebase/app';
 import 'firebase/auth';
-import {Observable, throwError} from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import {
-    AppleSignInResult,
-    CapacitorFirebaseAuthPlugin,
-    FacebookSignInResult,
-    GoogleSignInResult,
-    PhoneSignInResult,
-    SignInOptions,
-    TwitterSignInResult
+	AppleSignInResult,
+	CapacitorFirebaseAuthPlugin,
+	FacebookSignInResult,
+	GoogleSignInResult,
+	PhoneSignInResult,
+	SignInOptions,
+	TwitterSignInResult
 } from './definitions';
-import {CapacitorFirebaseAuth} from './web';
+import { CapacitorFirebaseAuth } from './web';
 
 const plugin: CapacitorFirebaseAuthPlugin = Plugins.CapacitorFirebaseAuth;
 
 if (Capacitor.platform === 'web') {
-    registerWebPlugin(CapacitorFirebaseAuth)
+	registerWebPlugin(CapacitorFirebaseAuth)
 }
 
 /**
@@ -36,8 +36,8 @@ export const cfaSignIn = (providerId: string, data?: SignInOptions): Observable<
 			return cfaSignInTwitter();
 		case facebookProvider:
 			return cfaSignInFacebook();
-        case cfaSignInAppleProvider:
-            return cfaSignInApple();
+		case cfaSignInAppleProvider:
+			return cfaSignInApple();
 		case phoneProvider:
 			return cfaSignInPhone(data.phone, data.verificationCode);
 		default:
@@ -54,7 +54,7 @@ export const cfaSignInGoogle = (): Observable<firebase.User> => {
 		const providerId = firebase.auth.GoogleAuthProvider.PROVIDER_ID;
 
 		// native sign in
-		plugin.signIn({providerId}).then((result: GoogleSignInResult) => {
+		plugin.signIn({ providerId }).then((result: GoogleSignInResult) => {
 			// create the credentials
 			const credential = firebase.auth.GoogleAuthProvider.credential(result.idToken);
 
@@ -82,7 +82,7 @@ export const cfaSignInTwitter = (): Observable<firebase.User> => {
 		const providerId = firebase.auth.TwitterAuthProvider.PROVIDER_ID;
 
 		// native sign in
-		plugin.signIn({providerId}).then((result :TwitterSignInResult) => {
+		plugin.signIn({ providerId }).then((result: TwitterSignInResult) => {
 			// create the credentials
 			const credential = firebase.auth.TwitterAuthProvider.credential(result.idToken, result.secret);
 
@@ -107,7 +107,7 @@ export const cfaSignInFacebook = (): Observable<firebase.User> => {
 		const providerId = firebase.auth.FacebookAuthProvider.PROVIDER_ID;
 
 		// native sign in
-		plugin.signIn({providerId}).then((result: FacebookSignInResult) => {
+		plugin.signIn({ providerId }).then((result: FacebookSignInResult) => {
 			// create the credentials
 			const credential = firebase.auth.FacebookAuthProvider.credential(result.idToken);
 
@@ -129,26 +129,26 @@ export const cfaSignInAppleProvider = 'apple.com';
  * Call the Apple sign in method on native and sign in on web layer with retrieved credentials.
  */
 export const cfaSignInApple = (): Observable<firebase.User> => {
-    return new Observable(observer => {
-        // native sign in
-        plugin.signIn({providerId: cfaSignInAppleProvider}).then((result: AppleSignInResult) => {
-            const {idToken, rawNonce} = result;
+	return new Observable(observer => {
+		// native sign in
+		plugin.signIn({ providerId: cfaSignInAppleProvider }).then((result: AppleSignInResult) => {
+			const { idToken, rawNonce } = result;
 
-            const provider = new firebase.auth.OAuthProvider('apple.com');
-            provider.addScope('email');
-            provider.addScope('name');
+			const provider = new firebase.auth.OAuthProvider('apple.com');
+			provider.addScope('email');
+			provider.addScope('name');
 
-            const credential = provider.credential({idToken, rawNonce})
+			const credential = provider.credential({ idToken, rawNonce })
 
-            // web sign in
-            firebase.app().auth().signInWithCredential(credential)
-                .then((userCredential: firebase.auth.UserCredential) => {
-                    observer.next(userCredential.user);
-                    observer.complete();
-                })
-                .catch((reject: any) => observer.error(reject));
-        }).catch(reject => observer.error(reject));
-    });
+			// web sign in
+			firebase.app().auth().signInWithCredential(credential)
+				.then((userCredential: firebase.auth.UserCredential) => {
+					observer.next(userCredential.user);
+					observer.complete();
+				})
+				.catch((reject: any) => observer.error(reject));
+		}).catch(reject => observer.error(reject));
+	});
 }
 
 /**
@@ -156,12 +156,12 @@ export const cfaSignInApple = (): Observable<firebase.User> => {
  * @param phone The user phone number.
  * @param verificationCode The verification code sent by SMS (optional).
  */
-export const cfaSignInPhone = (phone: string, verificationCode?: string) : Observable<firebase.User>  => {
+export const cfaSignInPhone = (phone: string, verificationCode?: string): Observable<firebase.User> => {
 	return new Observable(observer => {
 		// get the provider id
 		const providerId = firebase.auth.PhoneAuthProvider.PROVIDER_ID;
 
-		plugin.signIn({providerId, data:{phone, verificationCode}}).then((result: PhoneSignInResult) => {
+		plugin.signIn({ providerId, data: { phone, verificationCode } }).then((result: PhoneSignInResult) => {
 			// if there is no verification code
 			if (!result.verificationCode) {
 				return observer.complete();
@@ -186,7 +186,7 @@ export const cfaSignInPhone = (phone: string, verificationCode?: string) : Obser
 /**
  * Observable of one notification of <code>On Code Sent</code>event from Phone Verification process.
  */
-export const cfaSignInPhoneOnCodeSent = () : Observable<string> => {
+export const cfaSignInPhoneOnCodeSent = (): Observable<string> => {
 	return new Observable<string>(observer => {
 		// @ts-ignore
 		return plugin.addListener('cfaSignInPhoneOnCodeSent', (event: { verificationId: string }) => {
@@ -199,8 +199,8 @@ export const cfaSignInPhoneOnCodeSent = () : Observable<string> => {
 /**
  * Observable of one notification of <code>On Code Received</code> event from Phone Verification process.
  */
-export const cfaSignInPhoneOnCodeReceived = () : Observable<{verificationId: string, verificationCode: string}> => {
-	return new Observable<{verificationId: string, verificationCode: string}>(observer => {
+export const cfaSignInPhoneOnCodeReceived = (): Observable<{ verificationId: string, verificationCode: string }> => {
+	return new Observable<{ verificationId: string, verificationCode: string }>(observer => {
 		// @ts-ignore
 		return plugin.addListener('cfaSignInPhoneOnCodeReceived', (event: { verificationId: string, verificationCode: string }) => {
 			observer.next(event);

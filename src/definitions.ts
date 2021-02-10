@@ -1,4 +1,4 @@
-import * as firebase from 'firebase/app';
+import firebase from 'firebase/app';
 import 'firebase/auth';
 
 declare module "@capacitor/core" {
@@ -8,11 +8,11 @@ declare module "@capacitor/core" {
 }
 
 export interface CapacitorFirebaseAuthPlugin {
-  signIn(options: {providerId: string, data?: SignInOptions}): Promise<SignInResult>;
-  signOut(options: {}): Promise<void>;
+  signIn (options: { providerId: string, data?: SignInOptions }): Promise<SignInResult>;
+  signOut (options: {}): Promise<void>;
 }
 
-export class GoogleSignInResult{
+export class GoogleSignInResult {
   providerId = firebase.auth.GoogleAuthProvider.PROVIDER_ID;
   constructor(public idToken: string) {
   }
